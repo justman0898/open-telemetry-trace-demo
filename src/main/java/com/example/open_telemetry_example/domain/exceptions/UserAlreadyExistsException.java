@@ -4,11 +4,15 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class UserAlreadyExistsException extends Throwable {
+public class UserAlreadyExistsException extends Exception {
     private final HttpStatus status =  HttpStatus.CONFLICT;
 
 
     public UserAlreadyExistsException(String message) {
         super(message);
+    }
+
+    public HttpStatus getStatus() {
+        return  status;
     }
 }

@@ -5,6 +5,7 @@ import com.example.open_telemetry_example.domain.exceptions.UserAlreadyExistsExc
 import com.example.open_telemetry_example.domain.messages.UrlConstant;
 import com.example.open_telemetry_example.domain.models.RegisterUserCommand;
 import com.example.open_telemetry_example.domain.models.RegisterUserResult;
+import com.example.open_telemetry_example.domain.validation.LogSanitizer;
 import com.example.open_telemetry_example.infrastructure.adapter.input.rest.dto.general.ApiResponse;
 import com.example.open_telemetry_example.infrastructure.adapter.input.rest.dto.request.RegisterUserRequest;
 import com.example.open_telemetry_example.infrastructure.adapter.input.rest.dto.response.RegisterUserResponse;
@@ -31,14 +32,16 @@ public class AuthController {
     public ResponseEntity<Object> performRegistration(
             @RequestBody @Valid RegisterUserRequest request
     ) throws UserAlreadyExistsException {
-        log.info("Intitiating register user at controller");
+        String safeEmail = LogSanitizer.sanitize(LogSanitizer.maskEmail(request.getUsername()));
+        log.info("Initiating register user at controller for username:  {}", safeEmail);
         RegisterUserCommand registerUserCommand =
                 userWebMapper.toRegisterUserCommand(request);
-        log.info("Mapped register user command: {}", registerUserCommand);
         RegisterUserResult registerUserResult =
                 authenticationUseCase.register(registerUserCommand);
         RegisterUserResponse result = userWebMapper
                 .toRegisterUserResponse(registerUserResult);
+        log.info("Successfully registered user {}", safeEmail);
+
 
         return ResponseEntity.ok(
             ApiResponse.ok(result)

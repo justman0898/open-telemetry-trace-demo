@@ -1,13 +1,19 @@
 package com.example.open_telemetry_example.infrastructure.adapter.input.rest.dto.general;
 
 import com.example.open_telemetry_example.domain.messages.FeedbackMessages;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.ZonedDateTime;
 
 @Builder
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     @JsonProperty("isSuccessful")
     private boolean isSuccessful;

@@ -19,5 +19,5 @@ public class UserDetailsJpaEntity {
     @Column(unique = true, nullable = false)
     private String username;
     @Column(nullable = false)
-    String password;
+    private String password;
 }

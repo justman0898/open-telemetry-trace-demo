@@ -8,12 +8,12 @@ import com.example.open_telemetry_example.infrastructure.adapter.output.persiste
 import com.example.open_telemetry_example.infrastructure.adapter.output.persistence.mappers.UserPersistenceMapper;
 import com.example.open_telemetry_example.infrastructure.adapter.output.persistence.repositories.JpaUserRepository;
 import io.micrometer.tracing.annotation.NewSpan;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -23,23 +23,24 @@ public class AuthenticationOutputAdapter implements AuthenticationOutputPort {
     private final UserPersistenceMapper userPersistenceMapper;
 
     @Override
-    @Transactional
     @NewSpan("persistence-save-user")
     public RegisterUserResult save(RegisterUserCommand command)
             throws UserAlreadyExistsException {
         log.info("initializing save in AuthenticationOutputAdapter.......");
-        log.info("Command to be mapped: {}", command);
+        log.info("Command to be mapped: {}", command.getUsername());
         try {
             UserDetailsJpaEntity userDetailsJpaEntity = userPersistenceMapper
                     .toUserDetailsJpaEntity(command);
-            log.info("Mapped UserDetailsJpaEntity: {}", userDetailsJpaEntity);
+            log.info("Mapped UserDetailsJpaEntity: {}", userDetailsJpaEntity.getUsername());
             UserDetailsJpaEntity saved = jpaUserRepository
                     .save(userDetailsJpaEntity);
             RegisterUserResult result = userPersistenceMapper
                     .toRegisterUserResult(saved);
             return result;
-        } catch (Exception e) {
-            throw new UserAlreadyExistsException(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            if(e.getMostSpecificCause().getMessage().contains("users_username_key"))
+                throw new UserAlreadyExistsException("User Already exists");
+            throw e;
         }
     }
 }
