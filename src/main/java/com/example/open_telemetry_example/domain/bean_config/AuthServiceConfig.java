@@ -6,6 +6,7 @@ import com.example.open_telemetry_example.application.ports.output.UserRegistrat
 import com.example.open_telemetry_example.domain.service.AuthenticationService;
 import com.example.open_telemetry_example.infrastructure.adapter.output.persistence.adapter.AuthenticationOutputAdapter;
 import com.example.open_telemetry_example.infrastructure.adapter.output.persistence.repositories.JpaUserRepository;
+import io.opentelemetry.api.trace.Tracer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +16,11 @@ import org.springframework.context.annotation.Configuration;
 public class AuthServiceConfig {
     private final AuthenticationOutputPort authenticationOutputPort;
     private final UserRegistrationOutputPort userRegistrationOutputPort;
+    private final Tracer tracer;
     @Bean
     public AuthenticationUseCase authenticationUseCase() {
         AuthenticationService authenticationService =
-                new AuthenticationService(authenticationOutputPort, userRegistrationOutputPort);
+                new AuthenticationService(authenticationOutputPort, userRegistrationOutputPort, tracer);
         return authenticationService;
     }
 }

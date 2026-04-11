@@ -130,6 +130,14 @@
 			<version>1.60.1-alpha</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<version>3.5.13</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

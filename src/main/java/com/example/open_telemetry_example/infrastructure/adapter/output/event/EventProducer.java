@@ -29,6 +29,8 @@ public class EventProducer implements EventProducerOutputPort {
         String serializedBody = objectMapper.writeValueAsString(body);
         byte[] serializedBytesBody = serializedBody.getBytes(StandardCharsets.UTF_8);
 
+        log.info("Trace Headers to be streamed: {}", traceHeaders);
+
         this.userRegistrationProducer.newMessage()
                 .value(serializedBytesBody)
                 .properties(traceHeaders)

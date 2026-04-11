@@ -2,6 +2,8 @@ package com.example.open_telemetry_example.infrastructure.adapter.output.persist
 
 import com.example.open_telemetry_example.domain.exceptions.UserAlreadyExistsException;
 import com.example.open_telemetry_example.infrastructure.adapter.input.rest.dto.general.ApiResponse;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,6 +24,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             Exception e, HttpStatus status) {
         log.error("Global exceptionHandler: {}" ,e);
 
+        Span.current().setStatus(StatusCode.ERROR, e.getMessage());
+        Span.current().setAttribute("error.message", e.getMessage());
+        Span.current().recordException(e);
+
+
         return ResponseEntity
                 .status(status)
                 .body(
@@ -40,6 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             UserAlreadyExistsException e
     )
     {
+        Span.current().setAttribute("error.type", "UserAlreadyExistsException");
         return getBaseResponseEntity(e, e.getStatus());
     }
 
